@@ -1,0 +1,14 @@
+1. set 777 Permission to 
+
+2. move events.service to /lib/systemd/system/
+
+3. run: 
+sudo systemctl daemon-reload
+
+sudo systemctl enable events.service
+
+sudo systemctl start events.service
+
+4. Check Status:
+sudo systemctl status shellscript.service 
+

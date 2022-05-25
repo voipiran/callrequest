@@ -1,0 +1,8 @@
+[Unit]
+Description=VOIPIRAN Asterisk Events Listener
+
+[Service]
+ExecStart=/var/www/html/dialer/eventsService.sh
+
+[Install]
+WantedBy=multi-user.target

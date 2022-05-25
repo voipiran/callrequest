@@ -1,0 +1,4 @@
+
+https://192.168.2.101/dialer/dial.php?direction=FirstCallCustomer&pbxDestination=2001&customerNumber=09122103250
+
+https://192.168.2.101/dialer/dial.php?direction=FirstCallCustomer&pbxDestination=2001&customerNumber=09122103250&&sessionId=123456
