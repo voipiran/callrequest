@@ -80,11 +80,11 @@ insertLog("RequestParameters:".$parameters,"");
 if(is_numeric($out1) && is_numeric($in) || is_numeric($out1) && is_numeric($out2)){
 
 	if($direction == "inout"){
-			$astManager->Originate("Local/".$in."@from-internal-additional",$pbxoutprefix.$out1,"from-internal-additional","1","",$out1,"","","","");
+			$astManager->Originate("Local/".$in."@from-internal-additional",$pbxoutprefix.$out1,"from-internal-additional","1","","","",$out1,"","");
 	}else if($direction == "outin"){
-			$astManager->Originate($trunkTechName.$out1,$in,"from-internal-additional","1","",$cid,"","","","");
+			$astManager->Originate($trunkTechName.$out1,$in,"from-internal-additional","1","","","",$cid,"","");
 	}else if($direction == "outout"){
-			$astManager->Originate($trunkTechName.$out1,$pbxoutprefix.$out2,"from-internal-additional","1","",$cid,"","","","");
+			$astManager->Originate($trunkTechName.$out1,$pbxoutprefix.$out2,"from-internal-additional","1","","","",$cid,"","");
 	}
 
 }
