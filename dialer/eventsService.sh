@@ -1,2 +1,2 @@
 #!/bin/bash
-nohup php myscript.php &
+nohup php eventsListener.php &

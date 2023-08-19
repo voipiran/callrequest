@@ -1,10 +1,7 @@
 <?php
 require ('./CheckLicense.php');
- require ('manager.php');
- error_reporting(E_ALL);
-$clientPreviuosTime = 1;
-
-echo "VOIPIRAN CallRequest App"."<br/>";
+require ('manager.php');
+error_reporting(E_ALL);
 
 /***********************************/
 /***Get Parameters from ini File ***/
@@ -27,7 +24,6 @@ $async = $config['async'];
 $cid = $config['callerId'];
 $trunkTechName = $config['trunkTechName'];
 $pbxoutprefix = $config['pbxOutPrefix'];
-//$trunkname = $config['trunkName'];
 //request Limits
 $requesrSecsLimits = $config['requesrSecsLimits'];
 //logging
@@ -45,94 +41,53 @@ $allowedDomains2,
 $allowedDomains3,
 $allowedDomains4,
 $allowedDomains5,);
+/***END of Geting Parameters from ini File ***/
 
 
-/***START***/
-session_start();
-//$_SESSION['LAST_ACTIVITY'] = null;
-$referer = $_SERVER['HTTP_REFERER'];
-$clientParameters = parse_url($referer); //If yes, parse referrer
-$clientDomain=$clientParameters['host'];
-$clientTime = $_SERVER['REQUEST_TIME'];
+ /* Now we connect to the AMI interface */
+$astManager = new AGI_AsteriskManager();
 
-/**************************/
-/***Get POST Parameters ***/
-//$extensionTech = $_REQUEST['extensionTech'];
-$pbxDestination = $_REQUEST['pbxdestination'];
-$direction = $_REQUEST['direction'];
-$customerNumber = $_REQUEST['customernumber'];
-$sessionId = $_REQUEST['sessionid'];
-/*SET ACTION ID*/
-if (empty($_REQUEST[$sessionId]))
-$actionId = $customerNumber . "*" . $sessionId;
-if (empty($_REQUEST[$callerid]))
-$cid = $_REQUEST['callerid'];
-if (empty($_REQUEST[$trunkTechName]))
-$trunkTechName = $_REQUEST['trunktechname'];
-if (empty($_REQUEST[$pbxOutPrefix]))
-$pbxoutprefix = $_REQUEST['pbxoutprefix'];
-if (empty($_REQUEST[$async]))
-$async = $_REQUEST['async'];
+//$trunk_name="SIP/to-tci/";
+//$outbound_prefix = '';
+$trunk_clid = '43398000';
+
+//$ast_host = '127.0.0.1';
+//$ast_user = 'phpconfig';
+//$ast_pass = 'php[onfig'; 
+
+$out1 = $_REQUEST['out1'];
+$in = strtolower($_REQUEST['in']);
+$out2 = strtolower($_REQUEST['out2']);
+//direction=op or customer
+$direction = strtolower($_REQUEST['dir']);
 
 
-/*First LOG, Insert Parameters */
-$parameters = "pbxDestination:".$_REQUEST['pbxdestination']."-".
-"direction:".$_REQUEST['direction']."-".
-"customerNumber:".$customerNumber."-".
+$res = $astManager->connect($ast_host, $ast_user, $ast_pass);
+		if(!$res) {
+		echo "AMI NOT CONNECTED" ;
+		die(100);
+		}
+		echo "*****AMI CONNECTED" ;
+
+$parameters = "Out1:".$out1."-".
+"direction:".$direction."-".
+"Out2:".$out2."-".
 "callerid:".$cid."-".
 "trunkTechName:".$trunkTechName."-".
 "pbxOutPrefix:".$pbxoutprefix;
-insertLog("RequestParameters:".$parameters,$clientDomain);
+insertLog("RequestParameters:".$parameters,"");
 
+if(is_numeric($out1) && is_numeric($in) || is_numeric($out1) && is_numeric($out2)){
 
-/*Check Number Validation*/
-if((strtolower($CustomerNumberLenCheck) == 'yes') && !(($MinNumberLen <= strlen((string)$customerNumber)) && (strlen((string)$customerNumber) <= $MaxNumberLen)) ){
-	echo $prompNumberNotRange."<br/>";
-	insertLog("Error:".$prompNumberNotRange,$clientDomain);
-	exit;
-}
-
-/*Check International Number*/
-if((strtolower($BlockInternationalCalling) == 'yes') && preg_match("~^00[1-9]\d{8,}$~D", $customerNumber) ){
-	echo $$prompNumberIsInternational."<br/>";
-	insertLog("Error:".$$prompNumberIsInternational,$clientDomain);
-	exit;
-}
-
-//Check Domain Whitelist
-if(strtolower($allowedDomainsEnabled) == 'yes'){
-	if(!in_array( $clientDomain, $allowedDomains)) {
-	//echo $promptNotAllowed;
-	insertLog("Error:".$promptNotAllowed,$clientDomain);
-	exit(); //Stop running the script
+	if($direction == "inout"){
+			$astManager->Originate("Local/".$in."@from-internal-additional",$pbxoutprefix.$out1,"from-internal-additional","1","",$out1,"","","","");
+	}else if($direction == "outin"){
+			$astManager->Originate($trunkTechName.$out1,$in,"from-internal-additional","1","",$cid,"","","","");
+	}else if($direction == "outout"){
+			$astManager->Originate($trunkTechName.$out1,$pbxoutprefix.$out2,"from-internal-additional","1","",$cid,"","","","");
 	}
+
 }
-
-/*Coonect Asterisk and Make Call */
-/* Now we connect to the AMI interface */
-$astManager = new AGI_AsteriskManager();
-	$res = $astManager->connect($ast_host, $ast_user, $ast_pass);
-		if(!$res) {
-			insertLog("Error:".$promptAMINotConnected,$clientDomain);
-			exit();
-		}
-
-		if(strtolower($direction) == "firstcallpbx"){
-			//$astManager->Originate('LOCAL/'.$pbxDestination.'@from-internal',$pbxoutprefix.$customerNumber,"from-internal-additional","1","",$cid,"","","","",$async);
-			$astManager->Originate('LOCAL/'.$pbxDestination.'@from-internal',$pbxoutprefix.$customerNumber,"from-internal-additional","1","","","",$cid,"",$accountCode,$async,$actionId);
-			echo $prompOriginateDone."<br/>";
-			//insertLog("Originate:".'LOCAL/'.$pbxDestination.'-'.$pbxoutprefix.$customerNumber,$clientDomain);
-		}
-		elseif (strtolower($direction) == "firstcallcustomer"){
-			//$astManager->Originate($trunkTech.'/'.$trunkname.'/'.$customerNumber,$pbxDestination,"from-internal-additional","1","",$cid,"","","","",$async);
-			$astManager->Originate($trunkTechName.'/'.$customerNumber,$pbxDestination,"from-internal","1","","","",$cid,"",$accountCode,$async,$actionId);
-				echo $prompOriginateDone."<br/>";
-			//insertLog("Originate:".$trunkTechName.'-'.$cid,$clientDomain);
-		}
-
-//}//End RequestPerSec
-$res = $astManager->disconnect();
-exit();
 
 
 function insertLog($message,$clientDomain) 
@@ -149,5 +104,6 @@ function insertLog($message,$clientDomain)
 }
 
 
-
 ?>
+
+

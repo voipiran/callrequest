@@ -1,4 +1,8 @@
+https://ISSABEL_IP/makeCall.php?dir=inout&in=2001&out1=09122103200
+https://ISSABEL_IP/makeCall.php?dir=outin&in=2001&out1=09122103200
+https://ISSABEL_IP/makeCall.php?dir=outout&out2=09122105050&out1=09122103200
 
-https://192.168.2.101/dialer/dial.php?direction=firstcallcustomer&pbxdestination=2001&customernumber=09122103250
-
-https://192.168.2.101/dialer/dial.php?direction=firstcallpbx&pbxdestination=2001&customernumber=09122103250
+dir=inout,outin,outout
+out1= Shahri aval
+in= Shomare Karshenas ya Shomare bakhshi az ISSABEL
+out2 = Shari Dovom
