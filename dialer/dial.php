@@ -3,6 +3,8 @@ require ('./CheckLicense.php');
 require ('manager.php');
 error_reporting(E_ALL);
 
+echo "VOIPIRAN CallRequest App"."<br/>";
+
 /***********************************/
 /***Get Parameters from ini File ***/
 $config = parse_ini_file('callrequest-params.ini' , true) ;
