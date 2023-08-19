@@ -72,6 +72,7 @@ $res = $astManager->connect($ast_host, $ast_user, $ast_pass);
 $parameters = "Out1:".$out1."-".
 "direction:".$direction."-".
 "Out2:".$out2."-".
+"In:".$in."-".
 "callerid:".$cid."-".
 "trunkTechName:".$trunkTechName."-".
 "pbxOutPrefix:".$pbxoutprefix;
